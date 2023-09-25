@@ -149,9 +149,50 @@ def AStar():
     sortedFrontier(__sort)
     search(q2Graph)
 
+def BandB(g:Graph) -> bool:
+    # Output formatting
+    FILOFrontier(len(g.getNodes()))
+    ub = float('inf')
+    print("BandB\nFound: ", end='')
+
+    # frontier <-- [<s>];
+    frontier:deque[list[Node]] = deque([[g.getStart()]])
+
+    # while frontier is not empty
+    while len(frontier) != 0:
+        # select and remove path <no,....,nk> from frontier;
+        curPath = frontier.pop()
+        curNode = curPath[::-1][0]
+
+        # output formatting
+        print(curNode, end='')
+
+        # if goal(nk)
+        if g.isGoal(curNode):
+            #output formatting
+            print("\nPath:  " + Path(curPath).__str__(), end='\n\n')
+
+            # return <no,....,nk>;
+            return True
+        
+        # for every neighbor n of nk
+        # add <no,....,nk, n> to frontier;
+        # behaviour determined by EXTERNAL LOGIC section
+        if pathCost(curPath) + curNode.getH() < ub:
+            ub = pathCost(curPath) + curNode.getH()
+            frontier = addToFrontier(frontier, curPath, curNode)
+    
+    # output formatting
+    print("\nNo path found.")
+
+    # return NULL
+    return False
+    
+
 DFS()
 BFS()
 IDS()
 LCFS()
 BestFS()
 AStar()
+BandB()
