@@ -149,14 +149,20 @@ def AStar():
     sortedFrontier(__sort)
     search(q2Graph)
 
+# separate branch and bound search function
 def BandB(g:Graph) -> bool:
     # Output formatting
-    FILOFrontier(len(g.getNodes()))
-    ub = float('inf')
     print("BandB\nFound: ", end='')
 
     # frontier <-- [<s>];
     frontier:deque[list[Node]] = deque([[g.getStart()]])
+    
+    # initialize upper bound
+    ub = float('inf')
+    # initialize best path found
+    bestPath:list[Node] = []
+    # define frontier behaviour
+    FILOFrontier(len(g.getNodes()))
 
     # while frontier is not empty
     while len(frontier) != 0:
@@ -167,25 +173,27 @@ def BandB(g:Graph) -> bool:
         # output formatting
         print(curNode, end='')
 
-        # if goal(nk)
-        if g.isGoal(curNode):
-            #output formatting
-            print("\nPath:  " + Path(curPath).__str__(), end='\n\n')
-
-            # return <no,....,nk>;
-            return True
-        
-        # for every neighbor n of nk
-        # add <no,....,nk, n> to frontier;
-        # behaviour determined by EXTERNAL LOGIC section
+        # if cost of current path < ub
         if pathCost(curPath) + curNode.getH() < ub:
-            ub = pathCost(curPath) + curNode.getH()
+            # if goal(nk)
+            if g.isGoal(curNode):
+                # set best path
+                bestPath = curPath
+                # redefine upper bound
+                ub = pathCost(curPath)
+            
+            # for every neighbor n of nk
+            # add <no,....,nk, n> to frontier;
+            # behaviour determined by EXTERNAL LOGIC section
             frontier = addToFrontier(frontier, curPath, curNode)
-    
-    # output formatting
-    print("\nNo path found.")
 
-    # return NULL
+    # if solution found
+    if bestPath != []:
+        # output formatting
+        print("\nPath:  " + Path(bestPath).__str__(), end='\n\n')
+        return True
+    
+    print("\nNo path found.")
     return False
     
 
