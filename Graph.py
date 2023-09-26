@@ -29,7 +29,7 @@ class Graph:
     def getNodes(self):
         return self._nodes
     
-    # sadly unused adjacency matrix generator
+    # adjacency matrix generator
     def __str__(self) -> str:
         return [[self._nodes[i].getH()
                  if i==j

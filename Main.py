@@ -3,9 +3,9 @@ from Graph       import Graph
 
 
 # CPSC 322 Assignment 2 Question 2
-# graph as an adjacency matrix 
-# a node's weight to itself is its heuristic value
-                 # S   A   B   C   D   E   F   G   H   Z
+# graph as an adjacency matrix where
+# a node's weight to itself is its heuristic value.
+                   # S   A   B   C   D   E   F   G   H   Z
 mainGraph = Graph([[24,  3,  9,  4,  0,  0,  0,  0,  0,  0],  # S
                    [ 0, 21,  0,  2,  0,  0,  0,  0,  0,  0],  # A
                    [ 0,  0, 19, 13,  0,  0,  0,  0,  0,  0],  # B
@@ -23,42 +23,45 @@ Node.setLabels(['S', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'Z'])
 # ----------- GENERIC SEARCH ALGORITHM ----------- #
 
 def search(g:Graph) -> bool:
-    print("Found: ", end='')    # < -   -   -   -   -   -   -   -   - output formatting
+    print("Found: ", end='')  # Output formatting.
 
-    # add start node to frontier
+    # Add start node to frontier
     frontier:list[list[Node]] = [[g.getStart()]]
 
     # While frontier is not empty, get the next path and 
     # the last node of that path from the frontier. 
     # If the node is a goal node, return True,
     # otherwise expand the node according to 
-    # externally defined logic
+    # externally defined logic.
     while len(frontier) != 0:
         curPath:list[Node] = frontier[::-1][0]
         curNode:Node       = curPath [::-1][0]
 
-        print(curNode, end='')  # < -   -   -   -   -   -   -   -   - print expanded nodes
+        print(curNode, end='')  # Print expanded nodes.
 
         if g.isGoal(curNode):
-            print("\nPath:  " + printPath(curPath), end='\n\n') #   - print on solution found
+            print("\nPath:  " + printPath(curPath), end='\n\n')  # Print on solution found.
             return True
         
         frontier = addToFrontier(frontier)
-        # print([printPath(p) for p in frontier])
     
-    print("\nNo path found.")   # < -   -   -   -   -   -   -   -   - print on solution not found
+    print("\nNo path found.")  # Print on solution not found.
     return False
 
 # ---------------- EXTERNAL LOGIC ---------------- #
-# defines the frontier behaviour as chosen
-# by the top-level functions
+# Defines the frontier behaviour as specified
+# by the top-level functions.
 
 def frontierBehaviour(reverseFrontier:bool=False, reverseNeighbours:bool=False, depth:int=mainGraphSize, sortByCost:bool=False, sortByH:bool=False):
+    # reverseFrontier and reverseNeighbours allow for FIFO and LIFO
+    # behaviour with basic array splicing. depth allows the implementation
+    # of IDS. sortByCost and sortByH are used in LCFS, BestFS, and A*.
     global addToFrontier
     def addToFrontier(frontier:list[list[Node]]) -> list[list[Node]]:
         curPath    = frontier.pop()
         curNode    = curPath[::-1][0]
-        neighbours = list(curNode.getNeighbours())[::-2*int(reverseNeighbours)+1]
+        # -2*(int(bool))+1 --> False=1, True=-1 --> False=list[::1], True=list[::-1]
+        neighbours = list(curNode.getNeighbours())[::-2*int(reverseNeighbours)+1]   
 
         if len(curPath)<=depth:
             for neighbour in neighbours:
@@ -68,10 +71,11 @@ def frontierBehaviour(reverseFrontier:bool=False, reverseNeighbours:bool=False, 
                 frontier.append(t)
                 frontier   = frontier[::-2*int(reverseFrontier)+1]
         
+        # Sorts frontier as specified.
         costDict = {tuple(p):(int(sortByCost)*fx(p, sortByCost, sortByH)) for p in frontier}
         return [list(p) for p,fp in sorted(costDict.items(), key=lambda item: item[1], reverse=True)]
 
-# calculates path cost for use in LCFS, A*, and BandB
+# Calculates path cost for use in LCFS, A*, and BandB.
 def fx(path:list[Node], pathCost:bool, h:bool) -> int:
     cost = 0
     if pathCost:
@@ -85,8 +89,8 @@ def printPath(path:list[Node]):
     return "<" + ",".join(n.__str__() for n in path) + ">"
 
 # ---------- TOP-LEVEL SEARCH FUNCTIONS ---------- #
-# each function determines the frontier behaviour 
-# based on the selected search algorithm
+# Each function changes the frontier behaviour 
+# based on the selected search algorithm.
 
 def BFS(g:Graph):
     print("BFS")
@@ -102,7 +106,7 @@ def IDS(g:Graph):
     print("IDS")
     depth = 0
     result = False
-    # incrementally increase search depth until solution is found
+    # Increments search depth until solution is found.
     while result==False and depth <= mainGraphSize:
         depth += 1
         frontierBehaviour(True, False, depth)
@@ -123,30 +127,26 @@ def AStar(g:Graph):
     frontierBehaviour(True, False, mainGraphSize, True, True)
     search(g)
 
-# separate branch and bound search function
+# Separate branch-and-bound search function.
 def BandB(g:Graph) -> bool:
-    print("BandB")
-    
-    frontierBehaviour(False, True)  # < -   -   -   -   -   -   -   - as in DFS
+    frontierBehaviour(False, True)  # Frontier behaves as in DFS.
     ub       = float('inf')
     bestPath = []
 
-    print("Found: ", end='')    # < -   -   -   -   -   -   -   -   - output formatting
+    print("BandB")
+    print("Found: ", end='')
 
-    # add start node to frontier
     frontier:list[list[Node]] = [[g.getStart()]]
 
-    # While frontier is not empty, get the next path and 
-    # the last node of that path from the frontier. 
-    # If the node is a goal node, return True,
-    # otherwise expand the node according to 
-    # externally defined logic
     while len(frontier) != 0:
         curPath:list[Node] = frontier[::-1][0]
         curNode:Node       = curPath [::-1][0]
 
-        print(curNode, end='')  # < -   -   -   -   -   -   -   -   - print expanded nodes
+        print(curNode, end='')
 
+        # Only considers a path if f(p) < ub
+        # Does not return solution found, instead
+        # continues search with lower ub.
         if fx(curPath, True, True)< ub:
             if g.isGoal(curNode):
                 bestPath = curPath
@@ -154,6 +154,7 @@ def BandB(g:Graph) -> bool:
             
             frontier = addToFrontier(frontier)
         else:
+            # Discards current path.
             frontier.pop()
     
     if bestPath != []:
