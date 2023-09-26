@@ -68,11 +68,8 @@ def frontierBehaviour(reverseFrontier:bool=False, reverseNeighbours:bool=False, 
                 frontier.append(t)
                 frontier   = frontier[::-2*int(reverseFrontier)+1]
         
-        if sortByCost or sortByH:
-            costDict = {tuple(p):(int(sortByCost)*fx(p, sortByCost, sortByH)) for p in frontier}
-            return [list(p) for p,fp in sorted(costDict.items(), key=lambda item: item[1], reverse=True)]
-
-        return frontier
+        costDict = {tuple(p):(int(sortByCost)*fx(p, sortByCost, sortByH)) for p in frontier}
+        return [list(p) for p,fp in sorted(costDict.items(), key=lambda item: item[1], reverse=True)]
 
 # calculates path cost for use in LCFS, A*, and BandB
 def fx(path:list[Node], pathCost:bool, h:bool) -> int:
@@ -128,6 +125,8 @@ def AStar(g:Graph):
 
 # separate branch and bound search function
 def BandB(g:Graph) -> bool:
+    print("BandB")
+    
     frontierBehaviour(False, True)  # < -   -   -   -   -   -   -   - as in DFS
     ub       = float('inf')
     bestPath = []

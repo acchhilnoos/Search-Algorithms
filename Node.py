@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 class Node:
-
     _labels = []
 
     def __init__(self, index:int, h:int, neighbours:dict[Node, int]) -> None:
