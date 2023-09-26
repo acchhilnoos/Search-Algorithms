@@ -65,11 +65,11 @@ def frontierBehaviour(reverseFrontier:bool=False, reverseNeighbours:bool=False, 
 
         if len(curPath)<=depth:
             for neighbour in neighbours:
-                frontier   = frontier[::-2*int(reverseFrontier)+1]
+                frontier = frontier[::-2*int(reverseFrontier)+1]
                 t = curPath.copy()
                 t.append(neighbour)
                 frontier.append(t)
-                frontier   = frontier[::-2*int(reverseFrontier)+1]
+                frontier = frontier[::-2*int(reverseFrontier)+1]
         
         # Sorts frontier as specified.
         costDict = {tuple(p):(int(sortByCost)*fx(p, sortByCost, sortByH)) for p in frontier}
@@ -109,21 +109,28 @@ def IDS(g:Graph):
     # Increments search depth until solution is found.
     while result==False and depth <= mainGraphSize:
         depth += 1
+        # DFS behaviour with depth limiting
         frontierBehaviour(True, False, depth)
         result = search(g)
 
 def LCFS(g:Graph):
     print("LCFS")
+    # BFS (queue) behaviour preserves alphabetical order
+    # when sorted (by path cost)
     frontierBehaviour(True, False, mainGraphSize, True)
     search(g)
 
 def BestFS(g:Graph):
     print("BestFS")
+    # BFS (queue) behaviour preserves alphabetical order
+    # when sorted (by node heuristic value)
     frontierBehaviour(True, False, mainGraphSize, False, True)
     search(g)
 
 def AStar(g:Graph):
     print("A*")
+    # BFS (queue) behaviour preserves alphabetical order
+    # when sorted (by f(p))
     frontierBehaviour(True, False, mainGraphSize, True, True)
     search(g)
 
@@ -145,8 +152,8 @@ def BandB(g:Graph) -> bool:
         print(curNode, end='')
 
         # Only considers a path if f(p) < ub
-        # Does not return solution found, instead
-        # continues search with lower ub.
+        # Does not return when solution found, 
+        # instead continues search with lower ub.
         if fx(curPath, True, True)< ub:
             if g.isGoal(curNode):
                 bestPath = curPath
