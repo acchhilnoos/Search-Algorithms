@@ -37,4 +37,4 @@ class Graph:
                        if self._nodes[j] in self._nodes[i].getNeighbours()
                        else 0)
                        for j in range(0, len(self._nodes))]
-                       for i in range(0, len(self._nodes))]._str_()
+                       for i in range(0, len(self._nodes))].__str__()

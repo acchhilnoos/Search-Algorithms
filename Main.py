@@ -164,8 +164,6 @@ def BandB(g:Graph) -> bool:
     print("\nNo path found.")
     return False
 
-print(mainGraph.__str__())
-
 BFS   (mainGraph)
 DFS   (mainGraph)
 IDS   (mainGraph)
