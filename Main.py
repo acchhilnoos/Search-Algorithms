@@ -1,206 +1,173 @@
-from collections import deque
 from Node        import Node
-from Path        import Path
 from Graph       import Graph
+
+
+# CPSC 322 Assignment 2 Question 2
+# graph as an adjacency matrix 
+# a node's weight to itself is its heuristic value
+                 # S   A   B   C   D   E   F   G   H   Z
+mainGraph = Graph([[24,  3,  9,  4,  0,  0,  0,  0,  0,  0],  # S
+                   [ 0, 21,  0,  2,  0,  0,  0,  0,  0,  0],  # A
+                   [ 0,  0, 19, 13,  0,  0,  0,  0,  0,  0],  # B
+                   [ 0,  0,  0, 19,  5,  4,  8,  0,  0,  0],  # C
+                   [ 0,  0,  0,  0,  9,  0,  5,  0,  0,  0],  # D
+                   [ 0,  0,  0,  0,  0, 11,  7,  0,  0,  0],  # E
+                   [ 0,  0,  0,  0,  0,  0, 12,  8,  7, 18],  # F
+                   [ 0,  0,  0,  0,  0,  0,  0,  4,  0,  9],  # G
+                   [ 0,  0,  0,  0,  0,  0,  0,  0,  6,  6],  # H
+                   [ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0]]) # Z
+
+mainGraphSize = len(mainGraph.getNodes())
+Node.setLabels(['S', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'Z'])
 
 # ----------- GENERIC SEARCH ALGORITHM ----------- #
 
 def search(g:Graph) -> bool:
-    # Output formatting
-    print("Found: ", end='')
+    print("Found: ", end='')    # < -   -   -   -   -   -   -   -   - output formatting
 
-    # frontier <-- [<s>];
-    frontier:deque[list[Node]] = deque([[g.getStart()]])
+    # add start node to frontier
+    frontier:list[list[Node]] = [[g.getStart()]]
 
-    # while frontier is not empty
+    # While frontier is not empty, get the next path and 
+    # the last node of that path from the frontier. 
+    # If the node is a goal node, return True,
+    # otherwise expand the node according to 
+    # externally defined logic
     while len(frontier) != 0:
-        # select and remove path <no,....,nk> from frontier;
-        curPath = frontier.pop()
-        curNode = curPath[::-1][0]
+        curPath:list[Node] = frontier[::-1][0]
+        curNode:Node       = curPath [::-1][0]
 
-        # output formatting
-        print(curNode, end='')
+        print(curNode, end='')  # < -   -   -   -   -   -   -   -   - print expanded nodes
 
-        # if goal(nk)
         if g.isGoal(curNode):
-            #output formatting
-            print("\nPath:  " + Path(curPath).__str__(), end='\n\n')
-
-            # return <no,....,nk>;
+            print("\nPath:  " + printPath(curPath), end='\n\n') #   - print on solution found
             return True
         
-        # for every neighbor n of nk
-        # add <no,....,nk, n> to frontier;
-        # behaviour determined by EXTERNAL LOGIC section
-        frontier = addToFrontier(frontier, curPath, curNode)
+        frontier = addToFrontier(frontier)
+        # print([printPath(p) for p in frontier])
     
-    # output formatting
-    print("\nNo path found.")
-
-    # return NULL
+    print("\nNo path found.")   # < -   -   -   -   -   -   -   -   - print on solution not found
     return False
-
-# Q2 graph as an adjacency matrix 
-# a node's weight to itself is its heuristic value
-                 # S   A   B   C   D   E   F   G   H   Z
-q2Graph = Graph([[24,  3,  9,  4,  0,  0,  0,  0,  0,  0],  # S
-                 [ 0, 21,  0,  2,  0,  0,  0,  0,  0,  0],  # A
-                 [ 0,  0, 19, 13,  0,  0,  0,  0,  0,  0],  # B
-                 [ 0,  0,  0, 19,  5,  4,  8,  0,  0,  0],  # C
-                 [ 0,  0,  0,  0,  9,  0,  5,  0,  0,  0],  # D
-                 [ 0,  0,  0,  0,  0, 11,  7,  0,  0,  0],  # E
-                 [ 0,  0,  0,  0,  0,  0, 12,  8,  7, 18],  # F
-                 [ 0,  0,  0,  0,  0,  0,  0,  4,  0,  9],  # G
-                 [ 0,  0,  0,  0,  0,  0,  0,  0,  6,  6],  # H
-                 [ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0]]) # Z
 
 # ---------------- EXTERNAL LOGIC ---------------- #
 # defines the frontier behaviour as chosen
 # by the top-level functions
 
-# appends paths to left of frontier as in a queue
-def FIFOFrontier():
+def frontierBehaviour(reverseFrontier:bool=False, reverseNeighbours:bool=False, depth:int=mainGraphSize, sortByCost:bool=False, sortByH:bool=False):
     global addToFrontier
-    def addToFrontier(frontier:deque[list[Node]], curPath:list[Node], curNode:Node) -> deque[list[Node]]:
-        for neighbour in curNode.getNeighbours():
-            t = curPath.copy()
-            t.append(neighbour)
-            frontier.appendleft(t)
-        return frontier
+    def addToFrontier(frontier:list[list[Node]]) -> list[list[Node]]:
+        curPath    = frontier.pop()
+        curNode    = curPath[::-1][0]
+        neighbours = list(curNode.getNeighbours())[::-2*int(reverseNeighbours)+1]
 
-# appends paths to right of frontier as in a stack
-# in reverse to preserve alphabetical order
-# additional depth argument allows for re-use in IDS
-def FILOFrontier(depth:int):
-    global addToFrontier
-    def addToFrontier(frontier:deque[list[Node]], curPath:list[Node], curNode:Node) -> deque[list[Node]]:
         if len(curPath)<=depth:
-            for neighbour in reversed(curNode.getNeighbours()):
+            for neighbour in neighbours:
+                frontier   = frontier[::-2*int(reverseFrontier)+1]
                 t = curPath.copy()
                 t.append(neighbour)
                 frontier.append(t)
+                frontier   = frontier[::-2*int(reverseFrontier)+1]
+        
+        if sortByCost or sortByH:
+            costDict = {tuple(p):(int(sortByCost)*fx(p, sortByCost, sortByH)) for p in frontier}
+            return [list(p) for p,fp in sorted(costDict.items(), key=lambda item: item[1], reverse=True)]
+
         return frontier
 
-# calculates path cost for use in LCFS and A*
-def pathCost(p:list[Node]) -> int:
+# calculates path cost for use in LCFS, A*, and BandB
+def fx(path:list[Node], pathCost:bool, h:bool) -> int:
     cost = 0
-    for i in range(0, len(p)-1):
-        cost += p[i].getNeighbours()[p[i+1]]
+    if pathCost:
+        for i in range(0, len(path)-1):
+            cost += path[i].getNeighbours()[path[i+1]]
+    if h:
+        cost += path[::-1][0].getH()
     return cost
 
-# sorts frontier based on passed function
-def sortedFrontier(sort):
-    global addToFrontier
-    def addToFrontier(frontier:deque[list[Node]], curPath:list[Node], curNode:Node) -> deque[list[Node]]:
-        for neighbour in curNode.getNeighbours():
-            t = curPath.copy()
-            t.append(neighbour)
-            frontier.appendleft(t)
-        return sort(frontier)
+def printPath(path:list[Node]):
+    return "<" + ",".join(n.__str__() for n in path) + ">"
 
 # ---------- TOP-LEVEL SEARCH FUNCTIONS ---------- #
 # each function determines the frontier behaviour 
 # based on the selected search algorithm
 
-def BFS():
+def BFS(g:Graph):
     print("BFS")
-    FIFOFrontier()
-    search(q2Graph)
+    frontierBehaviour(True)
+    search(g)
 
-def DFS():
+def DFS(g:Graph):
     print("DFS")
-    FILOFrontier(len(q2Graph.getNodes()))
-    search(q2Graph)
+    frontierBehaviour(False, True)
+    search(g)
 
-def IDS():
+def IDS(g:Graph):
     print("IDS")
     depth = 0
     result = False
     # incrementally increase search depth until solution is found
-    while result==False and depth <= len(q2Graph.getNodes()):
+    while result==False and depth <= mainGraphSize:
         depth += 1
-        FILOFrontier(depth)
-        result = search(q2Graph)
+        frontierBehaviour(True, False, depth)
+        result = search(g)
 
-def LCFS():
+def LCFS(g:Graph):
     print("LCFS")
-    # sorts frontier by path cost
-    def __sort(frontier:deque[list[Node]]):
-        costDict = {tuple(p):pathCost(p) for p in frontier}
-        return deque([list(p) for p,c in sorted(costDict.items(), key=lambda item: item[1], reverse=True)])
-    sortedFrontier(__sort)
-    search(q2Graph)
+    frontierBehaviour(True, False, mainGraphSize, True)
+    search(g)
 
-def BestFS():
+def BestFS(g:Graph):
     print("BestFS")
-    # sorts frontier by heuristic value
-    def __sort(frontier:deque[list[Node]]):
-        costDict = {tuple(p):p[::-1][0].getH() for p in frontier}
-        return deque([list(p) for p,h in sorted(costDict.items(), key=lambda item: item[1], reverse=True)])
-    sortedFrontier(__sort)
-    search(q2Graph)
+    frontierBehaviour(True, False, mainGraphSize, False, True)
+    search(g)
 
-def AStar():
+def AStar(g:Graph):
     print("A*")
-    # sorts frontier by path cost + heuristic value
-    def __sort(frontier:deque[list[Node]]):
-        costDict = {tuple(p):(p[::-1][0].getH() + pathCost(p)) for p in frontier}
-        return deque([list(p) for p,f in sorted(costDict.items(), key=lambda item: item[1], reverse=True)])
-    sortedFrontier(__sort)
-    search(q2Graph)
+    frontierBehaviour(True, False, mainGraphSize, True, True)
+    search(g)
 
 # separate branch and bound search function
 def BandB(g:Graph) -> bool:
-    # Output formatting
-    print("BandB\nFound: ", end='')
+    frontierBehaviour(False, True)  # < -   -   -   -   -   -   -   - as in DFS
+    ub       = float('inf')
+    bestPath = []
 
-    # frontier <-- [<s>];
-    frontier:deque[list[Node]] = deque([[g.getStart()]])
-    
-    # initialize upper bound
-    ub = float('inf')
-    # initialize best path found
-    bestPath:list[Node] = []
-    # define frontier behaviour
-    FILOFrontier(len(g.getNodes()))
+    print("Found: ", end='')    # < -   -   -   -   -   -   -   -   - output formatting
 
-    # while frontier is not empty
+    # add start node to frontier
+    frontier:list[list[Node]] = [[g.getStart()]]
+
+    # While frontier is not empty, get the next path and 
+    # the last node of that path from the frontier. 
+    # If the node is a goal node, return True,
+    # otherwise expand the node according to 
+    # externally defined logic
     while len(frontier) != 0:
-        # select and remove path <no,....,nk> from frontier;
-        curPath = frontier.pop()
-        curNode = curPath[::-1][0]
+        curPath:list[Node] = frontier[::-1][0]
+        curNode:Node       = curPath [::-1][0]
 
-        # output formatting
-        print(curNode, end='')
+        print(curNode, end='')  # < -   -   -   -   -   -   -   -   - print expanded nodes
 
-        # if cost of current path < ub
-        if pathCost(curPath) + curNode.getH() < ub:
-            # if goal(nk)
+        if fx(curPath, True, True)< ub:
             if g.isGoal(curNode):
-                # set best path
                 bestPath = curPath
-                # redefine upper bound
-                ub = pathCost(curPath)
+                ub = fx(curPath, True, False)
             
-            # for every neighbor n of nk
-            # add <no,....,nk, n> to frontier;
-            # behaviour determined by EXTERNAL LOGIC section
-            frontier = addToFrontier(frontier, curPath, curNode)
-
-    # if solution found
+            frontier = addToFrontier(frontier)
+        else:
+            frontier.pop()
+    
     if bestPath != []:
-        # output formatting
-        print("\nPath:  " + Path(bestPath).__str__(), end='\n\n')
+        print("\nPath:  " + printPath(bestPath), end='\n\n')
         return True
     
     print("\nNo path found.")
     return False
-    
 
-DFS()
-BFS()
-IDS()
-LCFS()
-BestFS()
-AStar()
-BandB(q2Graph)
+BFS   (mainGraph)
+DFS   (mainGraph)
+IDS   (mainGraph)
+LCFS  (mainGraph)
+BestFS(mainGraph)
+AStar (mainGraph)
+BandB (mainGraph)
