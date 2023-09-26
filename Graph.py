@@ -31,10 +31,11 @@ class Graph:
     
     # adjacency matrix generator
     def __str__(self) -> str:
-        return [[self._nodes[i].getH()
-                 if i==j
-                 else (self._nodes[i].getNeighbours()[self._nodes[j]]
-                       if self._nodes[j] in self._nodes[i].getNeighbours()
-                       else 0)
-                       for j in range(0, len(self._nodes))]
-                       for i in range(0, len(self._nodes))].__str__()
+        m = [[self._nodes[i].getH()
+              if i==j
+              else (self._nodes[i].getNeighbours()[self._nodes[j]]
+                    if self._nodes[j] in self._nodes[i].getNeighbours()
+                    else 0)
+                    for j in range(0, len(self._nodes))]
+                    for i in range(0, len(self._nodes))]
+        return '\n'.join(n.__str__() for n in m)
