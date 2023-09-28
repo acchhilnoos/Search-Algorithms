@@ -17,6 +17,22 @@ mainGraph = Graph([[24,  3,  9,  4,  0,  0,  0,  0,  0,  0],  # S
                    [ 0,  0,  0,  0,  0,  0,  0,  0,  6,  6],  # H
                    [ 0,  0,  0,  0,  0,  0,  0,  0,  0,  0]]) # Z
 
+# CPSC 322 Assignment 2 Question 3
+# graph as an adjacency matrix where
+# a node's weight to itself is its heuristic value.
+                    # UBC   JB   KD   KB   MP   BBY  AP   RM  SRY   DT   SP
+# mainGraph = Graph([[158,  89, 103,   0,   0,   0,   0,   0,   0,   0,   0],  # UBC
+#                    [  0,  92,   0,  95,   0,   0,   0,   0,   0,   0,   0],  # JB
+#                    [  0,  92, 193,   0, 142,   0,   0,   0,   0,   0,   0],  # KD
+#                    [  0,   0,   0, 127,   0, 161,   0,   0,   0,  89,   0],  # KB
+#                    [  0,   0,   0, 125, 249, 109,   0, 102,   0,   0,   0],  # MP
+#                    [  0,   0,   0,   0,   0, 283,   0,   0,   0,   0,   0],  # BBY
+#                    [  0,   0,   0,   0,   0,   0, 299,   0,   0,   0,   0],  # AP
+#                    [  0,   0,   0,   0,   0,   0, 108, 322, 140,   0,   0],  # RM
+#                    [  0,   0,   0,   0,   0, 148,   0,   0, 392,   0,   0],  # SRY
+#                    [  0,   0,   0,   0,   0,   0,   0,   0,   0,  75,  75],  # DT
+#                    [  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0]]) # SP
+
 mainGraphSize = len(mainGraph.getNodes())
 Node.setLabels(['S', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'Z'])
 
