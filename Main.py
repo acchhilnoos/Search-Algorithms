@@ -165,7 +165,7 @@ def BandB(g:Graph) -> bool:
         curPath:list[Node] = frontier[::-1][0]
         curNode:Node       = curPath [::-1][0]
 
-        print(curNode, end='')
+        print(curNode, end=' ')
 
         # Only considers a path if f(p) < ub
         # Does not return when solution found, 
