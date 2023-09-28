@@ -53,7 +53,7 @@ def search(g:Graph) -> bool:
         curPath:list[Node] = frontier[::-1][0]
         curNode:Node       = curPath [::-1][0]
 
-        print(curNode, end='')  # Print expanded nodes.
+        print(curNode, end=' ')  # Print expanded nodes.
 
         if g.isGoal(curNode):
             print("\nPath:  " + printPath(curPath), end='\n\n')  # Print on solution found.
