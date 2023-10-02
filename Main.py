@@ -20,7 +20,7 @@ mainGraph = Graph([[24,  3,  9,  4,  0,  0,  0,  0,  0,  0],  # S
 # CPSC 322 Assignment 2 Question 3
 # graph as an adjacency matrix where
 # a node's weight to itself is its heuristic value.
-                    # UBC   JB   KD   KB   MP   BBY  AP   RM  SRY   DT   SP
+#                    # UBC   JB   KD   KB   MP   BBY  AP   RM  SRY   DT   SP
 # mainGraph = Graph([[158,  89, 103,   0,   0,   0,   0,   0,   0,   0,   0],  # UBC
 #                    [  0,  92,   0,  95,   0,   0,   0,   0,   0,   0,   0],  # JB
 #                    [  0,  92, 193,   0, 142,   0,   0,   0,   0,   0,   0],  # KD
