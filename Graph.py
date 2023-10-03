@@ -8,7 +8,7 @@ class Graph:
         for i in range(0, len(adjM)):
             self._nodes.append(Node(i, adjM[i][i], {}))
         
-        # add node neighbours and edges
+        # add node neighbours and edge weights
         for i in range(0, len(adjM)):
             for j in range(0, len(adjM[i])):
                 if j!=i and adjM[i][j] != 0:
